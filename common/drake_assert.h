@@ -1,5 +1,8 @@
 #pragma once
 
+#include <functional>
+#include <memory>
+#include <optional>
 #include <type_traits>
 
 /// @file
@@ -100,6 +103,40 @@ struct ConditionTraits {
   static constexpr bool is_valid = std::is_convertible_v<Condition, bool>;
   static bool Evaluate(const Condition& value) {
     return value;
+  }
+};
+
+// Specializations for bool-convertible types not recognized by the base
+// implementation.
+template <typename T>
+struct ConditionTraits<std::shared_ptr<T>> {
+  static constexpr bool is_valid = true;
+  static bool Evaluate(const std::shared_ptr<T>& pointer) {
+    return (pointer) ? true : false;
+  }
+};
+
+template <typename T>
+struct ConditionTraits<std::unique_ptr<T>> {
+  static constexpr bool is_valid = true;
+  static bool Evaluate(const std::unique_ptr<T>& pointer) {
+    return (pointer) ? true : false;
+  }
+};
+
+template <typename T>
+struct ConditionTraits<std::optional<T>> {
+  static constexpr bool is_valid = true;
+  static bool Evaluate(const std::optional<T>& opt) {
+    return opt.has_value();
+  }
+};
+
+template <typename R, typename... Args>
+struct ConditionTraits<std::function<R(Args...)>> {
+  static constexpr bool is_valid = true;
+  static bool Evaluate(const std::function<R(Args...)>& func) {
+    return (func) ? true : false;
   }
 };
 }  // namespace assert
