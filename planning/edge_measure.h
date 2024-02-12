@@ -88,7 +88,9 @@ class EdgeMeasure {
 
  private:
   double distance_{};
-  double alpha_{};  // -1 implies invalid; caller is not obliged to know this.
+  // For both below, -1 implies invalid; caller is not obliged to know this.
+  double alpha_{};
+  double colliding_alpha_{};
 };
 
 }  // namespace planning
