@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <limits>
 
+#include "drake/common/text_logging.h"
 #include "drake/geometry/proximity/aabb.h"
 #include "drake/geometry/proximity/boxes_overlap.h"
 #include "drake/geometry/proximity/triangle_surface_mesh.h"
@@ -385,9 +386,14 @@ Obb ObbMaker<MeshType>::OptimizeObbVolume(const Obb& box0) const {
 
 template <class MeshType>
 Obb ObbMaker<MeshType>::Compute() const {
+  drake::log()->info("ObbMaker:CalcOrientationByPca...");
   const RotationMatrixd R_MB = CalcOrientationByPca();
+  drake::log()->info("...ObbMaker:CalcOrientedBox...");
   const Obb box = CalcOrientedBox(R_MB);
-  return OptimizeObbVolume(box);
+  drake::log()->info("...ObbMaker:OptimizeObbVolume...");
+  const Obb final_box = OptimizeObbVolume(box);
+  drake::log()->info("...ObbMaker done");
+  return final_box;
 }
 
 template class ObbMaker<PolygonSurfaceMesh<double>>;

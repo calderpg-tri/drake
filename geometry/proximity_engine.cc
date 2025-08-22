@@ -15,6 +15,7 @@
 
 #include "drake/common/default_scalars.h"
 #include "drake/common/eigen_types.h"
+#include "drake/common/text_logging.h"
 #include "drake/geometry/geometry_ids.h"
 #include "drake/geometry/proximity/collisions_exist_callback.h"
 #include "drake/geometry/proximity/deformable_contact_geometries.h"
@@ -1174,10 +1175,13 @@ class ProximityEngine<T>::Impl : public ShapeReifier {
   void ImplementMeshSdfData(const Mesh& mesh, void* user_data) {
     const ReifyData& data = *static_cast<ReifyData*>(user_data);
     if (mesh.extension() == ".vtk") {
+      drake::log()->info("Starting MakeVolumeMeshFromVtk for VTK mesh...");
       // Assume the .vtk file is a tetrahedral mesh.  If that's not true,
       // we'll get an error.
       VolumeMesh<double> volume_mesh = MakeVolumeMeshFromVtk<double>(mesh);
+      drake::log()->info("... starting MeshDistanceBoundary for VTK mesh...");
       mesh_sdf_data_.emplace(data.id, MeshDistanceBoundary(volume_mesh));
+      drake::log()->info("... MeshDistanceBoundary for VTK mesh completed");
     } else if (mesh.extension() == ".obj") {
       mesh_sdf_data_.emplace(data.id,
                              MeshDistanceBoundary(ReadObjToTriangleSurfaceMesh(
